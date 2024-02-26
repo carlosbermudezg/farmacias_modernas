@@ -6,6 +6,13 @@ const getAll = catchError(async(req, res) => {
     return res.status(200).json(results);
 });
 
+const getOne = catchError(async(req, res)=>{
+    const { id } = req.params
+    const result = await Category.findCategoryById(id)
+    return res.status(200).json(result[0])
+})
+
 module.exports = {
-    getAll
+    getAll,
+    getOne
 }
