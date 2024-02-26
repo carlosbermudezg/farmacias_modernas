@@ -5,12 +5,12 @@ const verifyJWT = require('../utils/verifyJWT');
 const routerProduct = express.Router();
 
 routerProduct.route('/')
-    .get(getAll)
+    .get(verifyJWT, getAll)
 
 routerProduct.route('/:id')
-    .get(getOne)
+    .get(verifyJWT, getOne)
 
 routerProduct.route('/:id/:search')
-    .get(getSearch)
+    .get(verifyJWT, getSearch)
 
 module.exports = routerProduct;
