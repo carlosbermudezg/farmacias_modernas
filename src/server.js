@@ -7,6 +7,3 @@ const server = async ()=>{
 }
 
 server()
-
-
-
