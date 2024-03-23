@@ -1,16 +1,19 @@
-const { getAll, getOne, getSearch } = require('../controllers/product.controller');
-const express = require('express');
-const verifyJWT = require('../utils/verifyJWT');
+const { getAll, getOne, getSearch, getByCategory } = require('../controllers/product.controller')
+const express = require('express')
+const verifyJWT = require('../utils/verifyJWT')
 
-const routerProduct = express.Router();
+const routerProduct = express.Router()
 
 routerProduct.route('/')
-    .get(verifyJWT, getAll)
+    .get(verifyJWT,getAll)
+
+routerProduct.route('/getByCategory')
+    .get(getByCategory)
+
+routerProduct.route('/search')
+    .get(verifyJWT, getSearch)
 
 routerProduct.route('/:id')
     .get(verifyJWT, getOne)
-
-routerProduct.route('/:id/:search')
-    .get(verifyJWT, getSearch)
-
+    
 module.exports = routerProduct;

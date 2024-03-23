@@ -5,8 +5,8 @@ const verifyJWT = require('../utils/verifyJWT');
 const routerCategory = express.Router();
 
 routerCategory.route('/')
-    .get(verifyJWT, getAll)
+    .get(getAll)
 
 routerCategory.route('/:id')
-    .get(verifyJWT, getOne)
+    .get(getOne)
 module.exports = routerCategory;

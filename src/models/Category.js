@@ -1,7 +1,7 @@
 const pool = require('../utils/connMySql2')
 
 const findAllCategory = async()=>{
-    const result = await pool.query('SELECT * from productos_categorias limit 10');
+    const result = await pool.query('SELECT * from productos_categorias');
     return result
 }
 
