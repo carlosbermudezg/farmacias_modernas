@@ -5,19 +5,19 @@ const verifyJWT = require('../utils/verifyJWT')
 const routerProduct = express.Router()
 
 routerProduct.route('/')
-    .get(getAll)
+    .get(verifyJWT, getAll)
 
 routerProduct.route('/brands')
-    .get(getBrands)
+    .get(verifyJWT, getBrands)
 
 routerProduct.route('/brands/:id')
-    .get(getBrandById)
+    .get(verifyJWT, getBrandById)
 
 routerProduct.route('/byBrands')
-    .get(getProductsByBrands)
+    .get(verifyJWT, getProductsByBrands)
 
 routerProduct.route('/getByCategory')
-    .get(getByCategory)
+    .get(verifyJWT, getByCategory)
 
 routerProduct.route('/search')
     .get(verifyJWT, getSearch)
