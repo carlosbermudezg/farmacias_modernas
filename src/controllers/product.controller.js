@@ -26,6 +26,29 @@ const getAll = catchError(async(req, res) => {
     });
 });
 
+const getProductsByBrands = catchError(async(req, res) => {
+    const { array } = req.query
+    const results = await Product.getProductsByBrands(array)
+    return res.status(200).json({
+        data: results[0]
+    });
+});
+
+const getBrands = catchError(async(req, res) => {
+    const results = await Product.getBrands()
+    return res.status(200).json({
+        data: results
+    });
+});
+
+const getBrandById = catchError(async(req, res) => {
+    const { id } = req.params
+    const results = await Product.getBrandById(id)
+    return res.status(200).json({
+        data: results
+    });
+});
+
 const getByCategory = catchError(async(req, res) => {
     const { array } = req.query
     const results = await Product.productsByCategory(array)
@@ -69,5 +92,8 @@ module.exports = {
     getAll,
     getOne,
     getSearch,
-    getByCategory
+    getByCategory,
+    getBrands,
+    getProductsByBrands,
+    getBrandById
 }
