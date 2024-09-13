@@ -1,4 +1,4 @@
-const { getAll, getOne, getSearch, getByCategory, getBrands, getProductsByBrands, getBrandById } = require('../controllers/product.controller')
+const { getAll, getOne, getSearch, getByCategory, getBrands, getProductsByBrands, getBrandById, getBrandsBySearch } = require('../controllers/product.controller')
 const express = require('express')
 const verifyJWT = require('../utils/verifyJWT')
 
@@ -8,7 +8,10 @@ routerProduct.route('/')
     .get(verifyJWT, getAll)
 
 routerProduct.route('/brands')
-    .get(verifyJWT, getBrands)
+    .get(getBrands)
+
+routerProduct.route('/brandsBySearch')
+    .get(getBrandsBySearch)
 
 routerProduct.route('/brands/:id')
     .get(verifyJWT, getBrandById)

@@ -20,6 +20,14 @@ const getBrands = async()=>{
     const result = await pool.query('SELECT * from productos_marcas');
     return result[0]
 }
+const findBrandsBySearch = async(limit, offset, search)=>{
+    const result = await pool.query("SELECT * FROM productos_marcas WHERE marca_NOMBRE LIKE '%"+search+"%' limit "+limit+" offset " +offset)
+    return result
+}
+const countBrands = async(limit, search)=>{
+    const result = await pool.query("SELECT count(*) as count FROM productos_marcas WHERE marca_NOMBRE LIKE '%"+search+"%' limit "+limit+" offset 0")
+    return result
+}
 const getBrandById = async(id)=>{
     const result = await pool.query('SELECT * from productos_marcas WHERE marca_ID='+id);
     return result[0]
@@ -36,11 +44,6 @@ const findById = async(id)=>{
     const result = await pool.query('SELECT * from productos WHERE CODIGO='+id)
     return result
 }
-
-// const findByUserSearch = async(limit, offset, search)=>{
-//     const result = await pool.query("SELECT CANTIDAD, PRODUCTO FROM productos WHERE PRODUCTO LIKE '%"+search+"%' limit "+limit+" offset " +offset)
-//     return result
-// }
 const findByUserSearch = async(search)=>{
     const result = await pool.query("SELECT CANTIDAD, PRODUCTO, CATEGORIA, COSTO, MARCA, b1, b2 FROM productos WHERE PRODUCTO LIKE '%"+search+"%'")
     return result
@@ -58,5 +61,7 @@ module.exports = {
     productsByCategory,
     getBrands,
     getProductsByBrands,
-    getBrandById
+    getBrandById,
+    countBrands,
+    findBrandsBySearch
 }

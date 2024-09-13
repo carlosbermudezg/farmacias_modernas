@@ -38,8 +38,25 @@ const getBrands = catchError(async(req, res) => {
     const results = await Product.getBrands()
     return res.status(200).json({
         data: results
-    });
-});
+    })
+})
+
+const getBrandsBySearch = catchError(async(req, res)=>{
+    const { page, limit, search } = req.query
+    const offset = (page - 1) * limit
+    const totalPagesData = await Product.countBrands(limit, search)
+    const totalPages = Math.ceil(totalPagesData[0][0]?.count / limit)
+    const results = await Product.findBrandsBySearch(limit, offset, search)
+    return res.status(200).json({
+        data: results[0],
+        pagination: {
+            page: +page,
+            limit: +limit,
+            totalPages: totalPages,
+            totalBrands: totalPagesData[0][0]?.count
+        }
+    })
+})
 
 const getBrandById = catchError(async(req, res) => {
     const { id } = req.params
@@ -63,23 +80,6 @@ const getOne = catchError(async(req, res)=>{
     return res.status(200).json(result[0])
 })
 
-// const getSearch = catchError(async(req, res)=>{
-//     const { page, limit, search } = req.query
-//     const offset = (page - 1) * limit
-//     const totalPagesData = await Product.findByUserSearchCount(limit, search)
-//     const totalPages = Math.ceil(totalPagesData[0][0]?.count / limit)
-//     const results = await Product.findByUserSearch(limit, offset, search)
-//     return res.status(200).json({
-//         data: results[0],
-//         pagination: {
-//             page: +page,
-//             limit: +limit,
-//             totalPages: totalPages,
-//             totalProducts: totalPagesData[0][0]?.count
-//         }
-//     })
-// })
-
 const getSearch = catchError(async(req, res)=>{
     const { search } = req.query
     const results = await Product.findByUserSearch(search)
@@ -95,5 +95,6 @@ module.exports = {
     getByCategory,
     getBrands,
     getProductsByBrands,
-    getBrandById
+    getBrandById,
+    getBrandsBySearch
 }
