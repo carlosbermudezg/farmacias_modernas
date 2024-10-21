@@ -1,16 +1,88 @@
 const pool = require('../utils/connMySql2')
 
-// const allProductsPagination = async(limit, offset)=>{
-//     const result = await pool.query('SELECT CANTIDAD, PRODUCTO from productos limit ? offset ?', [+limit, +offset]);
-//     return result
-// }
-// CANTIDAD, PRODUCTO, CATEGORIA, b1, b2
-// CANTIDAD, PRODUCTO, CATEGORIA, COSTO, b1, b2
-const allProductsPagination = async()=>{
-    const result = await pool.query("SELECT * from productos WHERE CATEGORIA NOT IN (12,1,211,202,213,13,191,2,203,198,200,201,208,212,37)");
-    return result
-}
+const allProductsPagination = async (limit, offset, search, category, zone) => {
+    let result;
+    const zones = JSON.parse(zone).join(",")
 
+    if (category) {
+        // Convertimos el string de categorías a un array de números
+        const categoriesArray = category.split(',').map(Number);
+
+        // Usamos marcadores de posición (para el array de categorías)
+        const placeholders = categoriesArray.map(() => '?').join(',');
+
+        // Consulta con las categorías
+        result = await pool.query(
+            `SELECT ${zones}, PRODUCTO, CATEGORIA, COSTO, MARCA 
+            FROM productos 
+            WHERE CATEGORIA IN (${placeholders}) 
+            AND PRODUCTO LIKE ? 
+            LIMIT ? OFFSET ?`, 
+            [...categoriesArray, `%${search}%`, +limit, +offset]
+        );
+    } else {
+        // Consulta cuando no se pasa la categoría (excluye ciertas categorías)
+        result = await pool.query(
+            `SELECT ${zones}, PRODUCTO, CATEGORIA, COSTO, MARCA 
+            FROM productos 
+            WHERE CATEGORIA NOT IN (12, 1, 211, 202, 213, 13, 191, 2, 203, 198, 200, 201, 208, 212, 37) 
+            AND PRODUCTO LIKE ? 
+            LIMIT ? OFFSET ?`, 
+            [`%${search}%`, +limit, +offset]
+        );
+    }
+
+    return result;
+};
+const countProducts = async (search, category) => {
+    let result;
+
+    // Validar si category es un string no vacío
+    if (category && category.trim() !== '') {
+        // Convertir el string de categorías a un array
+        const categoriesArray = category.split(',').map(Number).filter(Boolean); // Filtramos valores no numéricos
+
+        if (categoriesArray.length > 0) {
+            // Crear los placeholders para las categorías
+            const placeholders = categoriesArray.map(() => '?').join(',');
+
+            // Consulta SQL con las categorías
+            result = await pool.query(
+                `SELECT count(*) as count 
+                FROM productos 
+                WHERE CATEGORIA IN (${placeholders}) 
+                AND PRODUCTO LIKE ?`, 
+                [...categoriesArray, `%${search}%`]
+            );
+        } else {
+            // Si el array de categorías está vacío, lanzar un error o manejarlo
+            throw new Error('Categorías inválidas o vacías');
+        }
+    } else {
+        // Consulta sin categorías, excluyendo ciertas categorías específicas
+        result = await pool.query(
+            `SELECT count(*) as count 
+            FROM productos 
+            WHERE CATEGORIA NOT IN (12,1,211,202,213,13,191,2,203,198,200,201,208,212,37) 
+            AND PRODUCTO LIKE ?`, 
+            [`%${search}%`]
+        );
+    }
+
+    return result;
+};
+const allProductsPaginationReceta = async (limit, offset, search) => {
+    const result = await pool.query(
+        `SELECT PRODUCTO, CATEGORIA, COSTO, MARCA 
+        FROM productos 
+        WHERE CATEGORIA NOT IN (12, 1, 211, 202, 213, 13, 191, 2, 203, 198, 200, 201, 208, 212, 37) 
+        AND PRODUCTO LIKE ? 
+        LIMIT ? OFFSET ?`, 
+        [`%${search}%`, +limit, +offset]
+    );
+
+    return result;
+};
 const productsByCategory = async(array)=>{
     const result = await pool.query('SELECT CANTIDAD, PRODUCTO, CATEGORIA, COSTO, MARCA, b1, b2 from productos WHERE CATEGORIA IN ' + array );
     return result
@@ -36,10 +108,6 @@ const getProductsByBrands = async(brands)=>{
     const result = await pool.query("SELECT * from productos WHERE MARCA IN " + brands);
     return result
 }
-const countProducts = async()=>{
-    const result = await pool.query('SELECT count(*) as count from productos');
-    return result
-}
 const findById = async(id)=>{
     const result = await pool.query('SELECT * from productos WHERE CODIGO='+id)
     return result
@@ -54,6 +122,7 @@ const findByUserSearchCount = async(limit, search)=>{
 }
 module.exports = {
     allProductsPagination,
+    allProductsPaginationReceta,
     findById,
     findByUserSearch,
     countProducts,

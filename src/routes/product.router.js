@@ -1,4 +1,4 @@
-const { getAll, getOne, getSearch, getByCategory, getBrands, getProductsByBrands, getBrandById, getBrandsBySearch } = require('../controllers/product.controller')
+const { getAll, getAllProductsReceta, getOne, getSearch, getByCategory, getBrands, getProductsByBrands, getBrandById, getBrandsBySearch } = require('../controllers/product.controller')
 const express = require('express')
 const verifyJWT = require('../utils/verifyJWT')
 
@@ -6,6 +6,9 @@ const routerProduct = express.Router()
 
 routerProduct.route('/')
     .get(verifyJWT, getAll)
+
+routerProduct.route('/getProductsReceta')
+    .get(verifyJWT, getAllProductsReceta)
 
 routerProduct.route('/brands')
     .get(getBrands)

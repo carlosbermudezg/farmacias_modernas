@@ -1,28 +1,41 @@
 const catchError = require('../utils/catchError');
 const Product = require('../models/Product');
 
-// const getAll = catchError(async(req, res) => {
-//     const { page, limit } = req.query
-//     const offset = (page - 1) * limit
-//     const results = await Product.allProductsPagination(limit, offset)
-//     const totalPagesData = await Product.countProducts()
-//     const totalPages = Math.ceil(totalPagesData[0][0]?.count / limit)
-//     console.log(totalPages)
-
-//     return res.status(200).json({
-//         data: results[0],
-//         pagination: {
-//             page: +page,
-//             limit: +limit,
-//             totalPages: totalPages,
-//             totalProducts: totalPagesData[0][0]?.count
-//         }
-//     });
-// });
 const getAll = catchError(async(req, res) => {
-    const results = await Product.allProductsPagination()
+    const { page, limit, search, category, zone } = req.query
+    const offset = (page - 1) * limit
+    const results = await Product.allProductsPagination(limit, offset, search, category, zone)
+    const totalPagesData = await Product.countProducts(search, category)
+    const totalPages = Math.ceil(totalPagesData[0][0]?.count / limit)
+    console.log(totalPages)
+
     return res.status(200).json({
-        data: results[0]
+        data: results[0],
+        pagination: {
+            page: +page,
+            limit: +limit,
+            totalPages: totalPages,
+            totalProducts: totalPagesData[0][0]?.count
+        }
+    });
+});
+
+const getAllProductsReceta = catchError(async(req, res) => {
+    const { page, limit, search } = req.query
+    const offset = (page - 1) * limit
+    const results = await Product.allProductsPaginationReceta(limit, offset, search)
+    const totalPagesData = await Product.countProducts(search)
+    const totalPages = Math.ceil(totalPagesData[0][0]?.count / limit)
+    console.log(totalPages)
+
+    return res.status(200).json({
+        data: results[0],
+        pagination: {
+            page: +page,
+            limit: +limit,
+            totalPages: totalPages,
+            totalProducts: totalPagesData[0][0]?.count
+        }
     });
 });
 
@@ -90,6 +103,7 @@ const getSearch = catchError(async(req, res)=>{
 
 module.exports = {
     getAll,
+    getAllProductsReceta,
     getOne,
     getSearch,
     getByCategory,
